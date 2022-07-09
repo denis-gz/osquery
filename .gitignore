@@ -24,7 +24,7 @@
 
 # Build Artifacts
 .provision
-build/
+build.*/
 *.bottle.tar.gz
 
 # Run Artifacts
