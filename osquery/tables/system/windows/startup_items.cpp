@@ -61,6 +61,9 @@ const std::set<std::string> kStartupStatusRegKeys = {
 const auto kStartupDisabledRegex = boost::regex("^0[0-9](?!0+$).*$");
 
 static inline void parseStartupPath(const std::string& path, Row& r) {
+  if (path.empty())
+      return;
+
   std::string expandedPath = path;
 
   // NOTE(ww): This is a pretty dumb expansion test, but the query that feeds
@@ -72,16 +75,32 @@ static inline void parseStartupPath(const std::string& path, Row& r) {
     }
   }
 
-  if (pathExists(fs::path(expandedPath)).ok()) {
+  if (pathExists(expandedPath)) {
     r["path"] = expandedPath;
   } else {
+    // Command lines in the Run or RunOnce keys often lack spaces around file path,
+    // so we use some guessing here to detect proper file path and arguments.
+    bool isQuoted = (expandedPath.front() == '"');
+    auto i = expandedPath.find(' ');
+    bool hasSpacesInPath = (i != std::string::npos) && (i < boost::to_lower_copy(expandedPath).find(".exe"));
+
     if (const auto argsp = splitArgs(expandedPath)) {
-      auto args = *argsp;
+      std::list<std::string> args(argsp->begin(), argsp->end());
+      std::string p;
+      if (isQuoted || !hasSpacesInPath) {
+        p = args.front();
+        args.pop_front();
+      }
+      else do {
+        if (!p.empty())
+            p += ' ';
+        p += args.front();
+        args.pop_front();
+      } while (boost::to_lower_copy(fs::extension(p)) != ".exe" && !args.empty());
 
-      r["path"] = args[0];
+      r["path"] = p;
 
-      if (args.size() > 1) {
-        args.erase(args.begin());
+      if (args.size() > 0) {
         r["args"] = boost::join(args, " ");
       }
     } else {
