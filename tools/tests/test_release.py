@@ -123,7 +123,7 @@ class ReleaseTests(unittest.TestCase):
         elif utils.platform() == "win32":
             output_bytes = subprocess.check_output(
                 "dumpbin /DEPENDENTS %s"
-                % (BUILD_DIR + "/osquery/osqueryd.exe"),
+                % (BUILD_DIR + "/osquery/RelWithDebInfo/osqueryd.exe"),
             )
 
             self.assertTrue(output_bytes)
