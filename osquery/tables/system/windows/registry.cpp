@@ -51,16 +51,19 @@ using reg_handle_t = std::unique_ptr<HKEY__, decltype(closeRegHandle)>;
 const std::set<int> kRegistryStringTypes = {
     REG_SZ, REG_MULTI_SZ, REG_EXPAND_SZ};
 
-const std::map<std::string, HKEY> kRegistryHives = {
-    {"HKEY_CLASSES_ROOT", HKEY_CLASSES_ROOT},
-    {"HKEY_CURRENT_CONFIG", HKEY_CURRENT_CONFIG},
-    {"HKEY_CURRENT_USER", HKEY_CURRENT_USER},
-    {"HKEY_CURRENT_USER_LOCAL_SETTINGS", HKEY_CURRENT_USER_LOCAL_SETTINGS},
-    {"HKEY_LOCAL_MACHINE", HKEY_LOCAL_MACHINE},
-    {"HKEY_PERFORMANCE_DATA", HKEY_PERFORMANCE_DATA},
-    {"HKEY_PERFORMANCE_NLSTEXT", HKEY_PERFORMANCE_NLSTEXT},
-    {"HKEY_PERFORMANCE_TEXT", HKEY_PERFORMANCE_TEXT},
-    {"HKEY_USERS", HKEY_USERS},
+const std::map<std::string, std::tuple<HKEY, DWORD>> kRegistryHives = {
+    {"HKEY_CLASSES_ROOT", { HKEY_CLASSES_ROOT, 0 }},
+    {"HKEY_CURRENT_CONFIG", { HKEY_CURRENT_CONFIG, 0 }},
+    {"HKEY_CURRENT_USER", { HKEY_CURRENT_USER, 0 }},
+    {"HKEY_CURRENT_USER_KEY64", { HKEY_CURRENT_USER, KEY_WOW64_64KEY }},
+    {"HKEY_CURRENT_USER_LOCAL_SETTINGS", { HKEY_CURRENT_USER_LOCAL_SETTINGS, 0 }},
+    {"HKEY_LOCAL_MACHINE", { HKEY_LOCAL_MACHINE, 0 }},
+    {"HKEY_LOCAL_MACHINE_KEY64", { HKEY_LOCAL_MACHINE, KEY_WOW64_64KEY }},
+    {"HKEY_PERFORMANCE_DATA", { HKEY_PERFORMANCE_DATA, 0 }},
+    {"HKEY_PERFORMANCE_NLSTEXT", { HKEY_PERFORMANCE_NLSTEXT, 0 }},
+    {"HKEY_PERFORMANCE_TEXT", { HKEY_PERFORMANCE_TEXT, 0 }},
+    {"HKEY_USERS", { HKEY_USERS, 0 }},
+    {"HKEY_USERS_KEY64", { HKEY_USERS, KEY_WOW64_64KEY }},
 };
 
 const std::map<DWORD, std::string> kRegistryTypes = {
@@ -225,10 +228,11 @@ Status queryKey(const std::string& keyPath, QueryData& results) {
   }
 
   HKEY hkey;
-  auto ret = RegOpenKeyExW(kRegistryHives.at(hive),
+  auto tup = kRegistryHives.at(hive);
+  auto ret = RegOpenKeyExW(std::get<0>(tup),
                            stringToWstring(key).c_str(),
                            0,
-                           KEY_READ,
+                           KEY_READ | std::get<1>(tup),
                            &hkey);
 
   if (ret != ERROR_SUCCESS) {

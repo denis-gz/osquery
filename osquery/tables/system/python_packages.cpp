@@ -176,13 +176,15 @@ QueryData genPythonPackagesImpl(QueryContext& context, Logger& logger) {
       }
     }
   } else if (isPlatform(PlatformType::TYPE_WINDOWS)) {
+    BOOL isWow64 = FALSE;
+    IsWow64Process(GetCurrentProcess(), &isWow64);
     for (const auto& key: kWinPythonInstallKey) {
+      auto installPathKey = (isWow64 ? "HKEY_LOCAL_MACHINE_KEY64\\" : "HKEY_LOCAL_MACHINE\\") + key;
       // Enumerate any system installed python packages
-      auto installPathKey = "HKEY_LOCAL_MACHINE\\" + kWinPythonInstallKey;
       genWinPythonPackages(installPathKey, results, logger);
 
+      installPathKey = (isWow64 ? "HKEY_USERS_KEY64\\%\\" : "HKEY_USERS\\%\\") + key;
       // Enumerate any user installed python packages
-      installPathKey = "HKEY_USERS\\%\\" + kWinPythonInstallKey;
       genWinPythonPackages(installPathKey, results, logger);
     }
   }
