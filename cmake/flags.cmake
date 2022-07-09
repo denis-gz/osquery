@@ -9,7 +9,7 @@ if(DEFINED PLATFORM_POSIX)
   set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 # The function creates the osquery_<c|cxx>_settings targets with compiler and linker flags
 # for internal targets and <c|cxx>_settings for any other target to use as a base.

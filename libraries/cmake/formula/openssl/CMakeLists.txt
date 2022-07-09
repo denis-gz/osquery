@@ -4,6 +4,8 @@ set(OPENSSL_VERSION "1.1.1o")
 set(OPENSSL_ARCHIVE_SHA256 "9384a2b0570dd80358841464677115df785edb941c71211f75076d72fe6b438f")
 
 set(OSQUERY_OPENSSL_ARCHIVE_PATH "" CACHE FILEPATH "Optional path to an openssl archive to use instead of downloading it")
+set(OPENSSL_SHARED shared)
+set(OPENSSL_NO_AUTOLOAD_CONFIG 1)
 
 include(ExternalProject)
 
@@ -13,7 +15,7 @@ function(opensslMain)
     no-ssl2
     no-ssl3
     no-asm
-    no-shared
+    shared
     no-weak-ssl-ciphers
     no-comp
     enable-cms
@@ -134,7 +136,7 @@ function(opensslMain)
 
     set(configure_command
       "${CMAKE_COMMAND}" -E env
-      "${PERL_EXECUTABLE}" Configure VC-WIN64A
+      "${PERL_EXECUTABLE}" Configure VC-WIN32
       ${common_options}
     )
 
