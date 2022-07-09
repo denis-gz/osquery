@@ -303,7 +303,7 @@ Status removePath(const fs::path& path) {
 }
 
 static bool checkForLoops(std::set<int>& dsym_inos, std::string path) {
-  if (path.empty() || path.back() != '/') {
+  if (path.empty() || path.back() != fs::path::preferred_separator) {
     return false;
   }
 
@@ -416,7 +416,7 @@ inline void replaceGlobWildcards(std::string& pattern, GlobLimits limits) {
         // Canonicalized directory paths will not include a trailing '/'.
         // However, if the wildcards are applied to files within a directory
         // then the missing '/' changes the wildcard meaning.
-        canonicalized += '/';
+        canonicalized += fs::path::preferred_separator;
       }
       // We are unable to canonicalize the meaning of post-wildcard limiters.
       pattern = fs::path(canonicalized + pattern.substr(base.size()))
