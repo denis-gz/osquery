@@ -13,6 +13,7 @@
 
 #ifdef WIN32
 #include <osquery/utils/conversions/windows/strings.h>
+#include <locale.h>
 #endif
 
 #include <osquery/logger/logger.h>
@@ -60,7 +61,13 @@ QueryData genTime(QueryContext& context) {
   }
 
   char weekday[10] = {0};
-  strftime(weekday, sizeof(weekday), "%A", &now);
+#ifdef WIN32
+  _locale_t c_loc = _create_locale(LC_ALL, "C");
+#endif
+  _strftime_l(weekday, sizeof(weekday), "%A", &now, c_loc);
+#ifdef WIN32
+  _free_locale(c_loc);
+#endif
 
   char timezone[5] = {0};
   strftime(timezone, sizeof(timezone), "%Z", &now);
