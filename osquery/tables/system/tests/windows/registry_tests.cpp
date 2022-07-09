@@ -111,6 +111,11 @@ TEST_F(RegistryTablesTest, test_registry_or_clause) {
   SQL combinedResults("SELECT * FROM registry WHERE key = \"" + kTestKey +
                       "\" OR key = \"" + kTestSpecificKey + "\"");
 
+  // std::includes() requires sequences to be sorted
+  std::sort(result1.rows().begin(), result1.rows().end());
+  std::sort(result2.rows().begin(), result2.rows().end());
+  std::sort(combinedResults.rows().begin(), combinedResults.rows().end());
+
   EXPECT_TRUE(result1.rows().size() > 0);
   EXPECT_TRUE(result2.rows().size() > 0);
   EXPECT_TRUE(combinedResults.rows().size() ==
