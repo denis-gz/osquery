@@ -13,7 +13,7 @@
 # Returns the final version in OSQUERY_VERSION_INTERNAL and its components in OSQUERY_VERSION_COMPONENTS
 function(detectOsqueryVersion)
   set(OSQUERY_VERSION "" CACHE STRING "Overrides osquery version with this value")
-  set(OSQUERY_VERSION_SUFFIX "" CACHE STRING "String to append when the version is automatically detected")
+  set(OSQUERY_VERSION_SUFFIX "-itarian" CACHE STRING "String to append when the version is automatically detected")
   set(OSQUERY_VERSION_AUTODETECTED "" CACHE STRING "osquery version autodetected through git. Do not manually set." FORCE)
   set(osquery_version 0.0.0)
 
@@ -21,7 +21,7 @@ function(detectOsqueryVersion)
     find_package(Git REQUIRED)
 
     execute_process(
-      COMMAND "${GIT_EXECUTABLE}" describe --tags --always --dirty
+      COMMAND "${GIT_EXECUTABLE}" describe --tags --always
       WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
       OUTPUT_VARIABLE branch_version
       RESULT_VARIABLE exit_code
